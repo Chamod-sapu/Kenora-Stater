@@ -15,11 +15,25 @@ export default function ActivityLog() {
   const handleExport = () => {
     if (exportState !== 'idle') return;
     setExportState('exporting');
+    
+    const headers = ['ID', 'Date', 'Time', 'Actor ID', 'Actor Name', 'Actor Role', 'Action Code', 'Action Desc', 'Target ID', 'Target Desc'];
+    const csvRows = filteredRecords.map(r => [
+      r.id, `"${r.date}"`, `"${r.time}"`, r.actorId, `"${r.actorName}"`, `"${r.actorRole}"`, r.actionCode, `"${r.actionDesc}"`, `"${r.targetId}"`, `"${r.targetDesc}"`
+    ].join(','));
+    const csvContent = [headers.join(','), ...csvRows].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `audit_log_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
     setTimeout(() => {
       setExportState('done');
-      setTimeout(() => {
-        setExportState('idle');
-      }, 2000);
+      setTimeout(() => setExportState('idle'), 2000);
     }, 900);
   };
 
@@ -313,37 +327,6 @@ export default function ActivityLog() {
 
   return (
     <div className="flex flex-col w-full">
-      {/* Operational Sub-Nav Header */}
-      <div className="w-full bg-surface-container-lowest shadow-sm mb-space-lg">
-        <div className="max-w-[1440px] mx-auto px-margin-lg py-space-sm flex flex-col sm:flex-row sm:items-center justify-between gap-space-md">
-          <div className="flex items-center gap-space-xs overflow-x-auto py-1">
-            <NavLink to="/" className="px-space-md py-space-xs rounded-xl font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors flex items-center gap-space-xs">
-              <span className="material-symbols-outlined text-[18px]">brush</span>
-              <span>Workshops</span>
-            </NavLink>
-            {isAdmin && (
-              <NavLink to="/users" className="px-space-md py-space-xs rounded-xl font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors flex items-center gap-space-xs">
-                <span className="material-symbols-outlined text-[18px]">badge</span>
-                <span>Staff Accounts</span>
-              </NavLink>
-            )}
-            <NavLink to="/audit-log" className="px-space-md py-space-xs rounded-xl font-label-md text-label-md bg-primary text-on-primary shadow-sm flex items-center gap-space-xs font-semibold">
-              <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>manage_history</span>
-              <span>Activity Log</span>
-              <span className="ml-1 px-1.5 py-0.2 bg-on-primary/20 text-on-primary rounded text-[10px] font-bold">LIVE</span>
-            </NavLink>
-          </div>
-          <div className="flex items-center gap-space-sm self-end sm:self-auto text-on-surface-variant">
-            <div className="flex items-center gap-1.5 px-space-sm py-1 bg-surface-container-low rounded-lg text-primary font-label-caps text-label-caps">
-              <span className="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
-              <span>SYNCED TO CLOUD LEDGER</span>
-            </div>
-            <span className="text-outline-variant">•</span>
-            <span className="font-body-sm text-body-sm text-on-surface-variant">Retention: 365 Days</span>
-          </div>
-        </div>
-      </div>
-
       <div className="max-w-[1440px] mx-auto w-full px-margin-lg flex flex-col gap-space-xl pb-space-xl">
         {/* Top Action / Title Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-space-lg">
@@ -354,15 +337,9 @@ export default function ActivityLog() {
                 <span className="material-symbols-outlined text-[14px]">history</span>
                 148 Events
               </span>
-              <span className="px-space-sm py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider">
-                Tamper-Evident SHA-256
-              </span>
             </div>
-            <p className="font-body-md text-body-md text-on-surface-variant">
-              Comprehensive audit trail of operational changes, workshop updates, attendee registrations, and staff access modifications across Colombo Central Studio.
-            </p>
           </div>
-          <div className="flex items-center gap-space-sm flex-wrap shrink-0">
+          <div className="flex items-center gap-space-sm flex-wrap shrink-0 p-5">
             {/* Live Polling Badge / Toggle */}
             <div className="flex items-center gap-2 bg-surface-container-lowest px-space-md py-2 rounded-xl shadow-sm text-on-surface">
               <div className="relative flex items-center justify-center w-3 h-3">
@@ -593,24 +570,6 @@ export default function ActivityLog() {
               </button>
             </div>
           </div>
-        </div>
-
-        {/* Compliance Callout Banner */}
-        <div className="bg-surface-container-low rounded-xl p-space-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-space-md shadow-sm">
-          <div className="flex items-start gap-space-md">
-            <div className="w-10 h-10 rounded-xl bg-primary-fixed text-primary flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-[22px]">policy</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-label-lg text-label-lg font-semibold text-on-surface">Civic Operations Audit Compliance Note</span>
-              <p className="font-body-sm text-body-sm text-on-surface-variant">
-                Audit records are strictly immutable and retained for exactly 365 calendar days in accordance with the Civic Workshop Management System security mandate (SL-DPA Act Compliance). Entries cannot be manually amended or wiped by system administrators.
-              </p>
-            </div>
-          </div>
-          <button className="px-space-md py-2 rounded-lg bg-surface-container-lowest text-primary hover:bg-surface-container-high transition-colors font-label-md text-label-md font-semibold whitespace-nowrap shadow-sm">
-            View Data Governance Policy
-          </button>
         </div>
         
         {/* Inspect Modal */}
