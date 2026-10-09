@@ -3,6 +3,7 @@ import Login from './pages/Login';
 import Workshops from './pages/Workshops';
 import WorkshopDetail from './pages/WorkshopDetail';
 import Users from './pages/Users';
+import ActivityLog from './pages/ActivityLog';
 import Layout from './components/Layout';
 import ProtectedRoute from './ProtectedRoute';
 import { useAuth } from './AuthContext';
@@ -21,6 +22,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/workshops/:id" element={<ProtectedRoute roles={desk}><WorkshopDetail /></ProtectedRoute>} />
         <Route path="/users" element={<ProtectedRoute roles={['admin']}><Users /></ProtectedRoute>} />
+        <Route path="/audit-log" element={<ProtectedRoute roles={['admin']}><ActivityLog /></ProtectedRoute>} />
       </Route>
     </Routes>
   );
