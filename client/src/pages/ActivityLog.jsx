@@ -1,16 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
+import api, { errMsg } from '../api';
 
 export default function ActivityLog() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
   const [modalOpen, setModalOpen] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterAction, setFilterAction] = useState('all');
   const [filterActor, setFilterActor] = useState('all');
   const [isRefreshing, setIsRefreshing] = useState(true);
   const [exportState, setExportState] = useState('idle'); // idle, exporting, done
+  const [records, setRecords] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    setLoading(true);
+    api.get('/audit')
+      .then(r => setRecords(r.data.items || []))
+      .catch(e => setError(errMsg(e)))
+      .finally(() => setLoading(false));
+  }, []);
 
   const handleExport = () => {
     if (exportState !== 'idle') return;
@@ -44,280 +57,31 @@ export default function ActivityLog() {
     else if (target === 'cancellations') setFilterAction('registration.cancel');
   };
 
-  // We will keep all the rows in state/hardcoded for visual purposes
-  const records = [
-    {
-      id: "EVT-90412",
-      time: "10 mins ago",
-      date: "14 May 2025, 11:24 AM",
-      actorId: "CP",
-      actorName: "Chaminda Perera",
-      actorRole: "Admin",
-      actorBg: "bg-primary text-on-primary",
-      actorBadge: "bg-primary-fixed text-on-primary-fixed",
-      actionCode: "workshop.update",
-      actionCodeBg: "bg-primary-fixed text-on-primary-fixed",
-      actionDesc: "Capacity altered",
-      targetIcon: "palette",
-      targetIconColor: "text-primary",
-      targetId: "POT-101",
-      targetDesc: "Intro to Pottery Studio A",
-      details: (
-        <div className="flex flex-col gap-1.5">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-on-surface">Capacity increased from <span className="line-through text-on-surface-variant font-semibold">20</span> to <span className="font-semibold text-secondary">25</span> (+5 seats unlocked)</span>
-          </div>
-          <div className="p-2 rounded bg-surface text-on-surface-variant font-body-sm text-body-sm flex items-center justify-between">
-            <span className="font-mono text-[11px] text-secondary font-medium">delta: {'{'} max_seats: 20 -&gt; 25, waitlist_mode: "auto" {'}'}</span>
-            <span className="text-[10px] font-semibold text-on-surface-variant">Studio 2A</span>
-          </div>
-        </div>
-      )
-    },
-    {
-      id: "EVT-90411",
-      time: "24 mins ago",
-      timeColor: "text-tertiary-container",
-      timeDot: "bg-error",
-      date: "14 May 2025, 11:10 AM",
-      actorId: "SK",
-      actorName: "Sanduni Kariyawasam",
-      actorRole: "Front-Desk Staff",
-      actorBg: "bg-surface-container-high text-primary",
-      actorBadge: "bg-surface-container-high text-on-surface-variant",
-      actionCode: "registration.cancel",
-      actionCodeBg: "bg-error-container text-on-error-container",
-      actionDesc: "Attendee withdrawal",
-      targetIcon: "person_cancel",
-      targetIconColor: "text-tertiary",
-      targetId: "Nimali Jayasuriya",
-      targetDesc: "REG-8921 (POT-101)",
-      details: (
-        <div className="flex flex-col gap-1">
-          <p className="text-on-surface">Registration cancelled for attendee. Reason recorded: <span className="italic text-on-surface font-medium">"Medical emergency / unwell"</span>.</p>
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="px-2 py-0.5 rounded bg-secondary-container text-on-secondary-container font-label-caps text-label-caps font-semibold">1 SEAT REOPENED</span>
-            <span className="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-caps text-label-caps">REFUND TRIGGERED (LKR 4,500)</span>
-          </div>
-        </div>
-      )
-    },
-    {
-      id: "EVT-90409",
-      time: "1 hour ago",
-      timeColor: "text-on-surface",
-      timeDot: "bg-outline",
-      date: "14 May 2025, 10:20 AM",
-      actorId: "CP",
-      actorName: "Chaminda Perera",
-      actorRole: "Admin",
-      actorBg: "bg-primary text-on-primary",
-      actorBadge: "bg-primary-fixed text-on-primary-fixed",
-      actionCode: "user.update",
-      actionCodeBg: "bg-surface-container-highest text-primary",
-      actionDesc: "Access privilege",
-      targetIcon: "manage_accounts",
-      targetIconColor: "text-on-surface-variant",
-      targetId: "Mahesh Senanayake",
-      targetDesc: "USR-044 • m.senanayake@trainingcentre.lk",
-      details: (
-        <div className="flex flex-col gap-1">
-          <p className="text-on-surface">Role updated from <span className="px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant font-medium font-label-md">Staff</span> to <span className="px-1.5 py-0.5 rounded bg-primary-fixed text-on-primary-fixed font-semibold font-label-md">Manager</span>.</p>
-          <span className="text-on-surface-variant text-body-sm">Granted permissions: [workshop_create, roster_export, override_waitlist]. MFA state remains enforced.</span>
-        </div>
-      )
-    },
-    {
-      id: "EVT-90405",
-      time: "2 hours ago",
-      timeColor: "text-on-surface",
-      date: "14 May 2025, 09:15 AM",
-      actorId: "MS",
-      actorName: "Mahesh Senanayake",
-      actorRole: "Manager",
-      actorBg: "bg-secondary-fixed text-on-secondary-fixed",
-      actorBadge: "bg-secondary-container text-on-secondary-container",
-      actionCode: "workshop.update",
-      actionCodeBg: "bg-primary-fixed text-on-primary-fixed",
-      actionDesc: "Session rescheduled",
-      targetIcon: "schedule",
-      targetIconColor: "text-primary",
-      targetId: "FIT-090",
-      targetDesc: "Ergonomic Safety in Craft Workshops",
-      details: (
-        <div className="flex flex-col gap-1">
-          <p className="text-on-surface">Schedule adjusted due to facilitator request:</p>
-          <div className="p-2 rounded bg-surface font-mono text-[11px] text-on-surface flex flex-col gap-0.5">
-            <div><span className="text-error font-semibold">- Original:</span> 14 May 2025 • 02:00 PM - 04:00 PM</div>
-            <div><span className="text-secondary font-semibold">+ New Time:</span> 15 May 2025 • 10:00 AM - 12:00 PM</div>
-          </div>
-          <span className="text-[11px] text-on-surface-variant">Automated SMS/Email notification sent to 18 enrolled participants.</span>
-        </div>
-      )
-    },
-    {
-      id: "EVT-90401",
-      time: "3 hours ago",
-      timeColor: "text-secondary",
-      date: "14 May 2025, 08:34 AM",
-      actorId: "SK",
-      actorName: "Sanduni Kariyawasam",
-      actorRole: "Front-Desk Staff",
-      actorBg: "bg-surface-container-high text-primary",
-      actorBadge: "bg-surface-container-high text-on-surface-variant",
-      actionCode: "registration.create",
-      actionCodeBg: "bg-secondary-container text-on-secondary-container",
-      actionDesc: "Walk-in booking",
-      targetIcon: "how_to_reg",
-      targetIconColor: "text-secondary",
-      targetId: "Samantha Wijesinghe",
-      targetDesc: "REG-8922 • intro-pottery",
-      details: (
-        <div className="flex flex-col gap-1">
-          <p className="text-on-surface">Registered attendee for <span className="font-semibold">POT-101 (Intro to Pottery)</span>.</p>
-          <div className="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
-            <span>Payment: Paid Cash at Front Counter (Receipt #REC-4109)</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-            <span className="text-secondary font-medium">Confirmed</span>
-          </div>
-        </div>
-      )
-    },
-    {
-      id: "EVT-90398",
-      time: "4 hours ago",
-      timeColor: "text-error",
-      timeIcon: "gpp_maybe",
-      date: "14 May 2025, 07:42 AM",
-      actorId: "SYS",
-      actorName: "Security Daemon",
-      actorRole: "Automated Shield",
-      actorBg: "bg-error text-on-error",
-      actorBadge: "bg-error-container text-on-error-container",
-      actionCode: "auth.login_failed",
-      actionCodeBg: "bg-tertiary-container text-on-tertiary",
-      actionDesc: "3 attempts tripped",
-      actionDescColor: "text-error",
-      targetIcon: "lock_clock",
-      targetIconColor: "text-error",
-      targetId: "nimal.p@trainingcentre.lk",
-      targetDesc: "Account ID: USR-038",
-      rowClass: "bg-error-container/20",
-      details: (
-        <div className="flex flex-col gap-1">
-          <p className="text-on-surface">3 consecutive failed password attempts from IP <code className="font-mono bg-surface-container px-1 py-0.5 rounded text-on-surface font-semibold">192.168.1.42</code> (Local Staff WiFi subnet).</p>
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded bg-tertiary-fixed text-on-tertiary-fixed font-label-caps text-label-caps font-bold">TEMPORARY 15-MIN LOCK ENGAGED</span>
-          </div>
-        </div>
-      )
-    },
-    {
-      id: "EVT-90380",
-      time: "Yesterday",
-      timeColor: "text-on-surface",
-      date: "13 May 2025, 04:55 PM",
-      actorId: "CP",
-      actorName: "Chaminda Perera",
-      actorRole: "Admin",
-      actorBg: "bg-primary text-on-primary",
-      actorBadge: "bg-primary-fixed text-on-primary-fixed",
-      actionCode: "user.update",
-      actionCodeBg: "bg-error-container text-on-error-container",
-      actionDesc: "Status deactivated",
-      targetIcon: "person_off",
-      targetIconColor: "text-tertiary",
-      targetId: "Nimal Pathirana",
-      targetDesc: "Former Assistant Instructor",
-      details: (
-        <div className="flex flex-col gap-1">
-          <p className="text-on-surface">Account deactivated &amp; active session tokens invalidated. Access revoked per contract conclusion.</p>
-          <span className="text-body-sm text-on-surface-variant font-mono text-[11px]">status: "active" -&gt; "disabled", badge_rfid: "revoked"</span>
-        </div>
-      )
-    },
-    {
-      id: "EVT-90372",
-      time: "Yesterday",
-      timeColor: "text-on-surface",
-      date: "13 May 2025, 02:18 PM",
-      actorId: "MS",
-      actorName: "Mahesh Senanayake",
-      actorRole: "Manager",
-      actorBg: "bg-secondary-fixed text-on-secondary-fixed",
-      actorBadge: "bg-secondary-container text-on-secondary-container",
-      actionCode: "workshop.create",
-      actionCodeBg: "bg-secondary-container text-on-secondary-container",
-      actionDesc: "New catalog item",
-      targetIcon: "add_circle",
-      targetIconColor: "text-primary",
-      targetId: "POT-102",
-      targetDesc: "Advanced Wheel Throwing",
-      details: (
-        <div className="flex flex-col gap-1">
-          <p className="text-on-surface">Created new masterclass: <span className="font-semibold">POT-102: Advanced Wheel Throwing</span> in Studio 2B.</p>
-          <div className="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
-            <span>Lead: Kasun Fernando</span>
-            <span>•</span>
-            <span>Capacity: 12 students</span>
-            <span>•</span>
-            <span>Fee: LKR 6,200</span>
-          </div>
-        </div>
-      )
-    },
-    {
-      id: "EVT-90355",
-      time: "2 days ago",
-      timeColor: "text-on-surface",
-      date: "12 May 2025, 11:05 AM",
-      actorId: "CP",
-      actorName: "Chaminda Perera",
-      actorRole: "Admin",
-      actorBg: "bg-primary text-on-primary",
-      actorBadge: "bg-primary-fixed text-on-primary-fixed",
-      actionCode: "user.create",
-      actionCodeBg: "bg-primary-fixed text-on-primary-fixed",
-      actionDesc: "Staff onboarded",
-      targetIcon: "person_add",
-      targetIconColor: "text-primary",
-      targetId: "Dilani Wickramasinghe",
-      targetDesc: "d.wickramasinghe@tc.lk",
-      details: (
-        <div className="flex flex-col gap-1">
-          <p className="text-on-surface">Provisioned staff profile with role <span className="font-semibold text-primary">Front-Desk Coordinator</span>. One-time welcome password link dispatched with 24-hr TTL.</p>
-        </div>
-      )
-    },
-    {
-      id: "EVT-90310",
-      time: "3 days ago",
-      timeColor: "text-tertiary",
-      date: "11 May 2025, 03:40 PM",
-      actorId: "CP",
-      actorName: "Chaminda Perera",
-      actorRole: "Admin",
-      actorBg: "bg-primary text-on-primary",
-      actorBadge: "bg-primary-fixed text-on-primary-fixed",
-      actionCode: "workshop.cancel",
-      actionCodeBg: "bg-error-container text-on-error-container",
-      actionDesc: "Session called off",
-      targetIcon: "event_busy",
-      targetIconColor: "text-tertiary",
-      targetId: "OUT-014",
-      targetDesc: "Open Air Botanical Sketching",
-      details: (
-        <div className="flex flex-col gap-1">
-          <p className="text-on-surface">Emergency cancellation invoked due to heavy monsoon rain advisory. 14 registrants automatically notified and refunded in full.</p>
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-caps text-label-caps">INCLEMENT WEATHER PROTOCOL</span>
-          </div>
-        </div>
-      )
-    }
-  ];
+  const mappedRecords = records.map(r => ({
+    id: r._id,
+    time: new Date(r.createdAt).toLocaleTimeString(),
+    date: new Date(r.createdAt).toLocaleDateString(),
+    actorId: r.actorName ? r.actorName.substring(0,2).toUpperCase() : '??',
+    actorName: r.actorName || 'System',
+    actorRole: 'User',
+    actorBg: "bg-surface-container-high text-primary",
+    actorBadge: "bg-surface-container-high text-on-surface-variant",
+    actionCode: r.action,
+    actionCodeBg: "bg-secondary-container text-on-secondary-container",
+    actionDesc: r.action,
+    targetIcon: "data_object",
+    targetIconColor: "text-secondary",
+    targetId: r.entityId || '-',
+    targetDesc: r.entity || '-',
+    raw: r,
+    details: (
+      <div className="flex flex-col gap-1">
+        <p className="text-on-surface">{r.action} on {r.entity}</p>
+      </div>
+    )
+  }));
 
-  const filteredRecords = records.filter(r => {
+  const filteredRecords = mappedRecords.filter(r => {
     const q = searchQuery.toLowerCase();
     const matchesSearch = !q || r.actorName.toLowerCase().includes(q) || r.targetId.toLowerCase().includes(q) || r.targetDesc.toLowerCase().includes(q);
     const matchesAction = filterAction === 'all' || r.actionCode.toLowerCase() === filterAction.toLowerCase();
@@ -535,7 +299,7 @@ export default function ActivityLog() {
                       {r.details}
                     </td>
                     <td className="py-space-md px-space-md align-top text-right">
-                      <button onClick={() => setModalOpen(true)} className="w-8 h-8 rounded-lg hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors ml-auto" title="View Full Event Payload JSON">
+                      <button onClick={() => { setSelectedRecord(r); setModalOpen(true); }} className="w-8 h-8 rounded-lg hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors ml-auto" title="View Full Event Payload JSON">
                         <span className="material-symbols-outlined text-[18px]">data_object</span>
                       </button>
                     </td>
@@ -549,25 +313,8 @@ export default function ActivityLog() {
             <div className="flex items-center gap-space-sm text-on-surface-variant font-body-sm text-body-sm">
               <span className="material-symbols-outlined text-primary text-[18px]">verified_user</span>
               <span>
-                Showing <strong className="text-on-surface font-semibold">1</strong> to <strong className="text-on-surface font-semibold">{Math.min(10, filteredRecords.length)}</strong> of <strong className="text-on-surface font-semibold">148</strong> audit log records
+                Showing <strong className="text-on-surface font-semibold">{Math.min(1, filteredRecords.length)}</strong> to <strong className="text-on-surface font-semibold">{filteredRecords.length}</strong> of <strong className="text-on-surface font-semibold">{filteredRecords.length}</strong> audit log records
               </span>
-            </div>
-            <div className="flex items-center gap-space-sm">
-              <button className="px-space-md h-9 rounded-lg bg-surface-container-lowest text-on-surface hover:bg-surface-container transition-colors shadow-sm font-label-md text-label-md disabled:opacity-50 flex items-center gap-1" disabled>
-                <span className="material-symbols-outlined text-[16px]">chevron_left</span>
-                <span>Previous</span>
-              </button>
-              <div className="flex items-center gap-1">
-                <span className="px-3 h-9 rounded-lg bg-primary text-on-primary font-label-md text-label-md font-semibold flex items-center justify-center shadow-sm">1</span>
-                <span className="px-3 h-9 rounded-lg bg-surface-container-lowest text-on-surface font-label-md text-label-md flex items-center justify-center hover:bg-surface-container cursor-pointer transition-colors shadow-sm">2</span>
-                <span className="px-3 h-9 rounded-lg bg-surface-container-lowest text-on-surface font-label-md text-label-md flex items-center justify-center hover:bg-surface-container cursor-pointer transition-colors shadow-sm">3</span>
-                <span className="text-on-surface-variant px-1 font-body-sm text-body-sm">...</span>
-                <span className="px-3 h-9 rounded-lg bg-surface-container-lowest text-on-surface font-label-md text-label-md flex items-center justify-center hover:bg-surface-container cursor-pointer transition-colors shadow-sm">15</span>
-              </div>
-              <button className="px-space-md h-9 rounded-lg bg-surface-container-lowest text-on-surface hover:bg-surface-container transition-colors shadow-sm font-label-md text-label-md flex items-center gap-1">
-                <span>Next</span>
-                <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-              </button>
             </div>
           </div>
         </div>
@@ -587,33 +334,11 @@ export default function ActivityLog() {
               </div>
               <div className="p-space-lg flex flex-col gap-space-md bg-surface-container-lowest">
                 <div className="flex items-center justify-between font-label-caps text-label-caps uppercase text-on-surface-variant">
-                  <span>Event Hash: 5f4dcc3b5aa765d61d8327deb882cf99</span>
+                  <span>Event Hash: {selectedRecord?.id || 'N/A'}</span>
                   <span className="text-secondary font-bold">VERIFIED AUTHENTIC</span>
                 </div>
                 <pre className="bg-inverse-surface text-inverse-on-surface p-space-md rounded-lg font-mono text-[12px] leading-relaxed overflow-x-auto">
-{`{
-  "event_id": "EVT-90412",
-  "timestamp": "2025-05-14T11:24:08.312Z",
-  "actor": {
-    "id": "USR-001",
-    "name": "Chaminda Perera",
-    "role": "ADMIN",
-    "ip_address": "192.168.1.15",
-    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"
-  },
-  "action": "workshop.update",
-  "target": {
-    "type": "WORKSHOP",
-    "id": "POT-101",
-    "title": "Intro to Pottery Studio A"
-  },
-  "diff": {
-    "capacity": { "previous": 20, "new": 25 },
-    "seats_remaining": { "previous": 0, "new": 5 },
-    "waitlist_dispatched": false
-  },
-  "status": "SUCCESS"
-}`}
+{JSON.stringify(selectedRecord?.raw || {}, null, 2)}
                 </pre>
                 <div className="flex justify-end gap-space-sm pt-2">
                   <button className="h-9 px-space-md rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md transition-colors flex items-center gap-1 shadow-sm">

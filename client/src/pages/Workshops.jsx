@@ -27,6 +27,7 @@ export default function Workshops() {
   const nav = useNavigate();
   const [f, setF] = useState(initial);
   const [data, setData] = useState({ items: [], total: 0, pages: 1, page: 1 });
+  const [stats, setStats] = useState({ totalCapacity: 0, totalBooked: 0, bookedPct: 0, scheduledCnt: 0, uniqueInstructors: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [creating, setCreating] = useState(false);
@@ -39,7 +40,14 @@ export default function Workshops() {
     if (f.from) params.from = new Date(`${f.from}T00:00:00`).toISOString();
     if (f.to) params.to = new Date(`${f.to}T23:59:59.999`).toISOString();
     if (f.hasSeats) params.hasSeats = 'true';
-    try { setData((await api.get('/workshops', { params })).data); }
+    try { 
+      const [resData, resStats] = await Promise.all([
+        api.get('/workshops', { params }),
+        api.get('/workshops/stats')
+      ]);
+      setData(resData.data);
+      setStats(resStats.data);
+    }
     catch (e) { setError(errMsg(e)); }
     finally { setLoading(false); }
   }, [f]);
@@ -53,12 +61,8 @@ export default function Workshops() {
     setF({ ...f, from: ymd(a), to: ymd(b), hasSeats: true, status: 'scheduled', page: 1 });
   };
 
-  // Derived metrics from loaded page
-  const totalCapacity = data.items.reduce((s, w) => s + (w.capacity || 0), 0);
-  const totalBooked   = data.items.reduce((s, w) => s + (w.activeCount || 0), 0);
-  const bookedPct     = totalCapacity > 0 ? Math.round((totalBooked / totalCapacity) * 100) : 0;
-  const scheduledCnt  = data.items.filter((w) => w.status === 'scheduled').length;
-  const uniqueInstructors = [...new Set(data.items.map((w) => w.instructor).filter(Boolean))].length;
+  // Metrics from server stats
+  const { totalCapacity, totalBooked, bookedPct, scheduledCnt, uniqueInstructors } = stats;
 
   return (
     <div className="w-full flex flex-col pb-10 overflow-x-hidden">
@@ -107,7 +111,7 @@ export default function Workshops() {
             <span className="font-label-sm text-label-sm text-primary font-medium">Next 7 days</span>
           </div>
           <div className="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
-            <div className="h-full bg-surface-tint transition-all duration-500" style={{ width: '75%' }} />
+            <div className="h-full bg-surface-tint transition-all duration-500" style={{ width: `${Math.min((scheduledCnt / 10) * 100, 100)}%` }} />
           </div>
         </div>
 
@@ -121,7 +125,7 @@ export default function Workshops() {
             <span className="font-label-sm text-label-sm text-tertiary font-medium">Across centres</span>
           </div>
           <div className="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
-            <div className="h-full bg-tertiary transition-all duration-500" style={{ width: '60%' }} />
+            <div className="h-full bg-tertiary transition-all duration-500" style={{ width: '0%' }} />
           </div>
         </div>
 
@@ -135,7 +139,7 @@ export default function Workshops() {
             <span className="font-label-sm text-label-sm text-on-surface-variant font-medium">All centres</span>
           </div>
           <div className="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
-            <div className="h-full bg-secondary transition-all duration-500" style={{ width: '100%' }} />
+            <div className="h-full bg-secondary transition-all duration-500" style={{ width: `${Math.min((uniqueInstructors / 10) * 100, 100)}%` }} />
           </div>
         </div>
       </div>
@@ -147,7 +151,7 @@ export default function Workshops() {
           <div className="w-full lg:w-72 xl:w-96 relative shrink-0">
             <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-[20px]">search</span>
             <input
-              className="w-full h-11 pl-10 pr-4 rounded-xl bg-surface text-on-surface font-body-md border border-outline-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-outline"
+              className="w-full h-11 !pl-10 !pr-4 !rounded-xl !bg-surface !text-on-surface font-body-md !border !border-outline-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-outline"
               placeholder="Search title, code..."
               value={f.q}
               onChange={set('q')}
@@ -157,7 +161,7 @@ export default function Workshops() {
           <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 w-full lg:w-auto">
             
             <div className="relative flex-1 sm:flex-none">
-              <select className="w-full sm:w-auto h-11 pl-3 pr-8 rounded-xl bg-surface border border-outline-variant/50 text-on-surface font-body-md appearance-none focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer" value={f.status} onChange={set('status')}>
+              <select className="w-full sm:w-auto h-11 !pl-3 !pr-8 !rounded-xl !bg-surface !border !border-outline-variant/50 !text-on-surface font-body-md appearance-none focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer" value={f.status} onChange={set('status')}>
                 <option value="">Status: Any</option>
                 <option value="scheduled">Scheduled</option>
                 <option value="completed">Completed</option>
@@ -166,11 +170,11 @@ export default function Workshops() {
               <span className="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-[20px]">expand_more</span>
             </div>
             
-            <div className="flex items-center bg-surface border border-outline-variant/50 rounded-xl px-3 h-11 flex-1 sm:flex-none min-w-[240px]">
+            <div className="flex items-center !bg-surface !border !border-outline-variant/50 !rounded-xl px-3 h-11 flex-1 sm:flex-none min-w-[240px]">
               <span className="text-label-sm text-on-surface-variant font-medium mr-2">From</span>
-              <input type="date" className="bg-transparent border-none outline-none text-body-sm sm:text-body-md text-on-surface cursor-pointer w-full" value={f.from} onChange={set('from')} />
+              <input type="date" className="!bg-transparent !border-none !outline-none !p-0 text-body-sm sm:text-body-md !text-on-surface cursor-pointer w-full" value={f.from} onChange={set('from')} />
               <span className="text-label-sm text-on-surface-variant font-medium mx-2">To</span>
-              <input type="date" className="bg-transparent border-none outline-none text-body-sm sm:text-body-md text-on-surface cursor-pointer w-full" value={f.to} onChange={set('to')} />
+              <input type="date" className="!bg-transparent !border-none !outline-none !p-0 text-body-sm sm:text-body-md !text-on-surface cursor-pointer w-full" value={f.to} onChange={set('to')} />
             </div>
 
             <label className="flex items-center gap-2 cursor-pointer text-body-md text-on-surface select-none py-2 px-1">
@@ -178,11 +182,11 @@ export default function Workshops() {
               <span className="whitespace-nowrap">Seats available</span>
             </label>
 
-            <button className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 h-11 bg-secondary-container hover:bg-secondary-fixed text-on-secondary-container rounded-xl font-label-md transition-colors cursor-pointer" type="button" onClick={thisWeekWithSeats}>
+            <button className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 h-11 !bg-primary hover:!bg-primary-container !text-on-primary !rounded-xl font-label-md transition-colors cursor-pointer" type="button" onClick={thisWeekWithSeats}>
               <span className="material-symbols-outlined text-[18px]">event_upcoming</span>
               <span className="whitespace-nowrap">Next 7 days</span>
             </button>
-            <button className="flex-1 sm:flex-none px-4 h-11 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-xl font-label-md transition-colors cursor-pointer" type="button" onClick={() => setF(initial)}>Reset</button>
+            <button className="flex-1 sm:flex-none px-4 h-11 !text-on-surface-variant hover:!text-on-surface hover:!bg-surface-container !bg-transparent !rounded-xl font-label-md transition-colors cursor-pointer" type="button" onClick={() => setF(initial)}>Reset</button>
           </div>
         </div>
       </div>

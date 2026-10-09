@@ -67,3 +67,18 @@ export async function list(q) {
   ]);
   return { items, total, page: q.page, pages: Math.max(1, Math.ceil(total / q.limit)) };
 }
+
+export async function getStats() {
+  const all = await Workshop.find();
+  const totalCapacity = all.reduce((s, w) => s + (w.capacity || 0), 0);
+  const totalBooked   = all.reduce((s, w) => s + (w.activeCount || 0), 0);
+  const bookedPct     = totalCapacity > 0 ? Math.round((totalBooked / totalCapacity) * 100) : 0;
+  
+  const now = new Date();
+  const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const scheduledCnt  = all.filter((w) => w.status === 'scheduled' && w.startsAt >= now && w.startsAt <= nextWeek).length;
+  
+  const uniqueInstructors = new Set(all.map((w) => w.instructor).filter(Boolean)).size;
+
+  return { totalCapacity, totalBooked, bookedPct, scheduledCnt, uniqueInstructors };
+}

@@ -41,6 +41,7 @@ const listQuery = z.object({
 const regListQuery = z.object({ status: z.enum(['all', 'active', 'cancelled']).default('all') });
 
 r.get('/', desk, async (req, res) => res.json(await workshops.list(listQuery.parse(req.query))));
+r.get('/stats', desk, async (req, res) => res.json(await workshops.getStats()));
 r.post('/', manage, validate(createSchema), async (req, res) => res.status(201).json(await workshops.create(req.body, req.user)));
 r.get('/:id', desk, async (req, res) => res.json(await workshops.getById(req.params.id)));
 r.patch('/:id', manage, validate(updateSchema), async (req, res) => res.json(await workshops.update(req.params.id, req.body, req.user)));
