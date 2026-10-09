@@ -1,23 +1,27 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
+import Workshops from './pages/Workshops';
+import WorkshopDetail from './pages/WorkshopDetail';
+import Users from './pages/Users';
+import Layout from './components/Layout';
 import ProtectedRoute from './ProtectedRoute';
 import { useAuth } from './AuthContext';
 
 function Home() {
-  const { user, logout } = useAuth();
-  return (
-    <div style={{ padding: 24 }}>
-      <h2>Hello, {user.name} ({user.role})</h2>
-      <button onClick={logout}>Logout</button>
-    </div>
-  );
+  const { user } = useAuth();
+  return user.role === 'admin' ? <Navigate to="/users" replace /> : <Workshops />;
 }
 
 export default function App() {
+  const desk = ['manager', 'staff'];
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-      <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+      <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+        <Route path="/" element={<Home />} />
+        <Route path="/workshops/:id" element={<ProtectedRoute roles={desk}><WorkshopDetail /></ProtectedRoute>} />
+        <Route path="/users" element={<ProtectedRoute roles={['admin']}><Users /></ProtectedRoute>} />
+      </Route>
     </Routes>
   );
 }

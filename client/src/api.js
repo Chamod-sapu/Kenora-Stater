@@ -7,4 +7,10 @@ api.interceptors.request.use((cfg) => {
   return cfg;
 });
 
+export const errMsg = (err) => {
+  const e = err.response?.data?.error;
+  const first = e?.details?.[0];
+  return first?.path ? `${first.path.join('.')}: ${first.message}` : e?.message || 'Something went wrong';
+};
+
 export default api;

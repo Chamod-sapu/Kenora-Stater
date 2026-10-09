@@ -10,7 +10,8 @@
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
     "seed": "node src/seed.js",
-    "test": "vitest run"
+    "test": "vitest run",
+    "reconcile": "node src/reconcile.js"
   },
   "keywords": [],
   "author": "",
