@@ -1,4 +1,5 @@
 import Workshop from '../models/Workshop.js';
+import Registration from '../models/Registration.js';
 import { AppError } from '../utils/AppError.js';
 import { audit } from './audit.service.js';
 
@@ -79,6 +80,7 @@ export async function getStats() {
   const scheduledCnt  = all.filter((w) => w.status === 'scheduled' && w.startsAt >= now && w.startsAt <= nextWeek).length;
   
   const uniqueInstructors = new Set(all.map((w) => w.instructor).filter(Boolean)).size;
+  const waitlistedCnt = await Registration.countDocuments({ status: 'waitlisted' });
 
-  return { totalCapacity, totalBooked, bookedPct, scheduledCnt, uniqueInstructors };
+  return { totalCapacity, totalBooked, bookedPct, scheduledCnt, uniqueInstructors, waitlistedCnt };
 }

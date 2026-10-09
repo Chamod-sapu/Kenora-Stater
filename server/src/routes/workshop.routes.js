@@ -38,7 +38,7 @@ const listQuery = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(50).default(20),
 });
-const regListQuery = z.object({ status: z.enum(['all', 'active', 'cancelled']).default('all') });
+const regListQuery = z.object({ status: z.enum(['all', 'active', 'cancelled', 'waitlisted']).default('all') });
 
 r.get('/', desk, async (req, res) => res.json(await workshops.list(listQuery.parse(req.query))));
 r.get('/stats', desk, async (req, res) => res.json(await workshops.getStats()));

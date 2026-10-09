@@ -150,45 +150,38 @@ export default function WorkshopDetail() {
 
       {/* 3. Register an Attendee Card */}
       {open ? (
-        w.seatsAvailable > 0 ? (
-          <section className="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm mb-space-lg">
-            <div className="flex items-center gap-space-xs mb-space-md">
+        <section className="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm mb-space-lg">
+          <div className="flex items-center justify-between mb-space-md">
+            <div className="flex items-center gap-space-xs">
               <span className="material-symbols-outlined text-primary text-[22px]">person_add</span>
               <h2 className="font-headline-sm text-headline-sm text-on-surface">Register an attendee</h2>
             </div>
-            <form className="flex flex-col md:flex-row items-end gap-space-md" onSubmit={register}>
-              <div className="flex-1 w-full">
-                <label className="block font-label-md text-label-md text-on-surface mb-1.5 font-medium" htmlFor="attendee-name">Full name</label>
-                <div className="relative flex items-center">
-                  <input required className="w-full h-10 px-3 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest shadow-sm" id="attendee-name" placeholder="e.g. Kasun Silva" type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}/>
-                </div>
-              </div>
-              <div className="flex-1 w-full">
-                <label className="block font-label-md text-label-md text-on-surface mb-1.5 font-medium" htmlFor="attendee-email">Email address</label>
-                <div className="relative flex items-center">
-                  <input required className="w-full h-10 px-3 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest shadow-sm" id="attendee-email" placeholder="e.g. kasun@example.com" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}/>
-                </div>
-              </div>
-              <button disabled={busy} className="w-full md:w-auto h-10 px-space-lg bg-primary-container hover:bg-primary text-on-primary font-label-lg text-label-lg rounded-xl whitespace-nowrap transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50" type="submit">
-                <span className="material-symbols-outlined text-[18px]">add_circle</span>
-                <span>{busy ? 'Registering...' : 'Register'}</span>
-              </button>
-            </form>
-          </section>
-        ) : (
-          <section className="rounded-xl p-space-lg shadow-sm mb-space-lg bg-amber-50 border border-amber-200 text-amber-900" style={{ backgroundColor: '#fffbeb', border: '1px solid #fde68a', color: '#78350f' }}>
-            <div className="flex items-start gap-space-sm">
-              <span className="material-symbols-outlined text-[24px] text-amber-600 flex-shrink-0 mt-0.5" style={{ color: '#d97706' }}>warning</span>
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  <h2 className="font-headline-sm text-headline-sm font-semibold text-amber-950" style={{ color: '#451a03' }}>This workshop is full.</h2>
-                  <span className="px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider bg-amber-200 text-amber-900" style={{ backgroundColor: '#fde68a', color: '#78350f' }}>{w.activeCount} Confirmed</span>
-                </div>
-                <p className="font-body-md text-body-md text-amber-900 leading-relaxed" style={{ color: '#78350f' }}>Registrations are currently closed ({w.activeCount} of {w.capacity} seats filled). Check back if existing attendees cancel or contact the manager for waitlist inquiries.</p>
+            {w.seatsAvailable <= 0 && (
+              <span className="px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider bg-amber-200 text-amber-900" style={{ backgroundColor: '#fde68a', color: '#78350f' }}>Waitlist Only</span>
+            )}
+          </div>
+          {w.seatsAvailable <= 0 && (
+             <p className="font-body-md text-body-md text-amber-900 leading-relaxed mb-4" style={{ color: '#78350f' }}>This workshop is currently full. New registrations will be placed on the waitlist.</p>
+          )}
+          <form className="flex flex-col md:flex-row items-end gap-space-md" onSubmit={register}>
+            <div className="flex-1 w-full">
+              <label className="block font-label-md text-label-md text-on-surface mb-1.5 font-medium" htmlFor="attendee-name">Full name</label>
+              <div className="relative flex items-center">
+                <input required className="w-full h-10 px-3 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest shadow-sm" id="attendee-name" placeholder="e.g. Kasun Silva" type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}/>
               </div>
             </div>
-          </section>
-        )
+            <div className="flex-1 w-full">
+              <label className="block font-label-md text-label-md text-on-surface mb-1.5 font-medium" htmlFor="attendee-email">Email address</label>
+              <div className="relative flex items-center">
+                <input required className="w-full h-10 px-3 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest shadow-sm" id="attendee-email" placeholder="e.g. kasun@example.com" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}/>
+              </div>
+            </div>
+            <button disabled={busy} className="w-full md:w-auto h-10 px-space-lg bg-primary-container hover:bg-primary text-on-primary font-label-lg text-label-lg rounded-xl whitespace-nowrap transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50" type="submit">
+              <span className="material-symbols-outlined text-[18px]">add_circle</span>
+              <span>{busy ? 'Processing...' : (w.seatsAvailable > 0 ? 'Register' : 'Join Waitlist')}</span>
+            </button>
+          </form>
+        </section>
       ) : (
         <section className="bg-surface-container-low text-on-surface-variant rounded-xl p-space-lg shadow-sm mb-space-lg flex items-center gap-4">
           <span className="material-symbols-outlined text-[32px]">event_busy</span>
@@ -235,7 +228,7 @@ export default function WorkshopDetail() {
                   </tr>
                 )}
                 {regs.map(r => (
-                  r.status === 'active' ? (
+                  r.status !== 'cancelled' ? (
                     <tr key={r.id} className="hover:bg-surface-container-low/60 transition-colors">
                       <td className="py-3.5 px-space-md font-semibold text-on-surface">
                         <div className="flex items-center gap-2">
@@ -245,10 +238,17 @@ export default function WorkshopDetail() {
                       </td>
                       <td className="py-3.5 px-space-md text-on-surface-variant">{r.email}</td>
                       <td className="py-3.5 px-space-md">
-                        <span className="inline-flex items-center gap-1 bg-secondary-container/40 text-on-secondary-container px-2.5 py-0.5 rounded-full font-label-md text-label-md font-medium">
-                          <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-                          active
-                        </span>
+                        {r.status === 'active' ? (
+                          <span className="inline-flex items-center gap-1 bg-secondary-container/40 text-on-secondary-container px-2.5 py-0.5 rounded-full font-label-md text-label-md font-medium">
+                            <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                            active
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 bg-tertiary-container/40 text-on-tertiary-container px-2.5 py-0.5 rounded-full font-label-md text-label-md font-medium">
+                            <span className="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                            waitlisted
+                          </span>
+                        )}
                       </td>
                       <td className="py-3.5 px-space-md text-on-surface-variant font-body-sm text-body-sm">
                         {when(r.createdAt)} <span className="text-outline text-xs">by {r.registeredBy?.name ?? '?'}</span>

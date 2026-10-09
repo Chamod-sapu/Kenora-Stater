@@ -27,7 +27,7 @@ export default function Workshops() {
   const nav = useNavigate();
   const [f, setF] = useState(initial);
   const [data, setData] = useState({ items: [], total: 0, pages: 1, page: 1 });
-  const [stats, setStats] = useState({ totalCapacity: 0, totalBooked: 0, bookedPct: 0, scheduledCnt: 0, uniqueInstructors: 0 });
+  const [stats, setStats] = useState({ totalCapacity: 0, totalBooked: 0, bookedPct: 0, scheduledCnt: 0, uniqueInstructors: 0, waitlistedCnt: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [creating, setCreating] = useState(false);
@@ -62,7 +62,7 @@ export default function Workshops() {
   };
 
   // Metrics from server stats
-  const { totalCapacity, totalBooked, bookedPct, scheduledCnt, uniqueInstructors } = stats;
+  const { totalCapacity, totalBooked, bookedPct, scheduledCnt, uniqueInstructors, waitlistedCnt } = stats;
 
   return (
     <div className="w-full flex flex-col pb-10 overflow-x-hidden">
@@ -121,11 +121,11 @@ export default function Workshops() {
             <span className="material-symbols-outlined text-tertiary bg-tertiary/10 p-1.5 rounded-lg text-[20px]">how_to_reg</span>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="font-headline-sm text-headline-sm font-bold text-on-surface">—</span>
+            <span className="font-headline-sm text-headline-sm font-bold text-on-surface">{waitlistedCnt > 0 ? waitlistedCnt : '—'}</span>
             <span className="font-label-sm text-label-sm text-tertiary font-medium">Across centres</span>
           </div>
           <div className="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
-            <div className="h-full bg-tertiary transition-all duration-500" style={{ width: '0%' }} />
+            <div className="h-full bg-tertiary transition-all duration-500" style={{ width: `${Math.min((waitlistedCnt / 10) * 100, 100)}%` }} />
           </div>
         </div>
 
