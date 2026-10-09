@@ -59,7 +59,6 @@ export default function Login() {
                 <span className="login-required">Required</span>
               </div>
               <div className="login-input-wrap">
-                <span className="material-symbols-outlined login-input-icon">mail</span>
                 <input
                   id="email"
                   type="email"
@@ -77,7 +76,6 @@ export default function Login() {
             <div className="login-field">
               <label htmlFor="password" className="login-label">Password</label>
               <div className="login-input-wrap">
-                <span className="material-symbols-outlined login-input-icon">lock</span>
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}

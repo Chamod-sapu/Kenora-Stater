@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
 
 export default function ActivityLog() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
   const [modalOpen, setModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterAction, setFilterAction] = useState('all');
@@ -314,14 +317,16 @@ export default function ActivityLog() {
       <div className="w-full bg-surface-container-lowest shadow-sm mb-space-lg">
         <div className="max-w-[1440px] mx-auto px-margin-lg py-space-sm flex flex-col sm:flex-row sm:items-center justify-between gap-space-md">
           <div className="flex items-center gap-space-xs overflow-x-auto py-1">
-            <NavLink to="/workshops" className="px-space-md py-space-xs rounded-xl font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors flex items-center gap-space-xs">
+            <NavLink to="/" className="px-space-md py-space-xs rounded-xl font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors flex items-center gap-space-xs">
               <span className="material-symbols-outlined text-[18px]">brush</span>
               <span>Workshops</span>
             </NavLink>
-            <NavLink to="/users" className="px-space-md py-space-xs rounded-xl font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors flex items-center gap-space-xs">
-              <span className="material-symbols-outlined text-[18px]">badge</span>
-              <span>Staff Accounts</span>
-            </NavLink>
+            {isAdmin && (
+              <NavLink to="/users" className="px-space-md py-space-xs rounded-xl font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors flex items-center gap-space-xs">
+                <span className="material-symbols-outlined text-[18px]">badge</span>
+                <span>Staff Accounts</span>
+              </NavLink>
+            )}
             <NavLink to="/audit-log" className="px-space-md py-space-xs rounded-xl font-label-md text-label-md bg-primary text-on-primary shadow-sm flex items-center gap-space-xs font-semibold">
               <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>manage_history</span>
               <span>Activity Log</span>
@@ -398,9 +403,8 @@ export default function ActivityLog() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-space-md">
             {/* Search Keyword */}
             <div className="lg:col-span-4 relative flex items-center">
-              <span className="material-symbols-outlined absolute left-3 text-on-surface-variant text-[20px] pointer-events-none">search</span>
               <input 
-                className="w-full h-10 pl-10 pr-space-md rounded-lg bg-surface-container-lowest text-on-surface font-body-md text-body-md focus:bg-surface-container-lowest focus:outline-none transition-all placeholder:text-on-surface-variant/70 shadow-sm" 
+                className="w-full h-10 px-3 rounded-lg bg-surface-container-lowest text-on-surface font-body-md text-body-md focus:bg-surface-container-lowest focus:outline-none transition-all placeholder:text-on-surface-variant/70 shadow-sm" 
                 placeholder="Search by actor, target ID, or keyword..." 
                 type="text"
                 value={searchQuery}
@@ -410,9 +414,8 @@ export default function ActivityLog() {
             {/* Action Type Filter */}
             <div className="lg:col-span-3">
               <div className="relative flex items-center">
-                <span className="material-symbols-outlined absolute left-3 text-on-surface-variant text-[18px] pointer-events-none">category</span>
                 <select 
-                  className="w-full h-10 pl-9 pr-8 rounded-lg bg-surface-container-lowest text-on-surface font-body-md text-body-md focus:outline-none transition-all appearance-none cursor-pointer shadow-sm"
+                  className="w-full h-10 pl-3 pr-8 rounded-lg bg-surface-container-lowest text-on-surface font-body-md text-body-md focus:outline-none transition-all appearance-none cursor-pointer shadow-sm"
                   value={filterAction}
                   onChange={e => setFilterAction(e.target.value)}
                 >
@@ -432,8 +435,7 @@ export default function ActivityLog() {
             {/* Date Range Filter */}
             <div className="lg:col-span-2">
               <div className="relative flex items-center">
-                <span className="material-symbols-outlined absolute left-3 text-on-surface-variant text-[18px] pointer-events-none">calendar_today</span>
-                <select className="w-full h-10 pl-9 pr-8 rounded-lg bg-surface-container-lowest text-on-surface font-body-md text-body-md focus:outline-none transition-all appearance-none cursor-pointer shadow-sm">
+                <select className="w-full h-10 pl-3 pr-8 rounded-lg bg-surface-container-lowest text-on-surface font-body-md text-body-md focus:outline-none transition-all appearance-none cursor-pointer shadow-sm">
                   <option value="today">Today</option>
                   <option value="7d">Last 7 days</option>
                   <option value="30d">Last 30 days</option>
@@ -445,9 +447,8 @@ export default function ActivityLog() {
             {/* Actor Filter */}
             <div className="lg:col-span-2">
               <div className="relative flex items-center">
-                <span className="material-symbols-outlined absolute left-3 text-on-surface-variant text-[18px] pointer-events-none">person_search</span>
                 <select 
-                  className="w-full h-10 pl-9 pr-8 rounded-lg bg-surface-container-lowest text-on-surface font-body-md text-body-md focus:outline-none transition-all appearance-none cursor-pointer shadow-sm"
+                  className="w-full h-10 pl-3 pr-8 rounded-lg bg-surface-container-lowest text-on-surface font-body-md text-body-md focus:outline-none transition-all appearance-none cursor-pointer shadow-sm"
                   value={filterActor}
                   onChange={e => setFilterActor(e.target.value)}
                 >

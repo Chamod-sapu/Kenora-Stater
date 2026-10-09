@@ -160,15 +160,13 @@ export default function WorkshopDetail() {
               <div className="flex-1 w-full">
                 <label className="block font-label-md text-label-md text-on-surface mb-1.5 font-medium" htmlFor="attendee-name">Full name</label>
                 <div className="relative flex items-center">
-                  <span className="material-symbols-outlined absolute left-3 text-outline text-[18px] pointer-events-none">badge</span>
-                  <input required className="w-full h-10 pl-9 pr-3 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest shadow-sm" id="attendee-name" placeholder="e.g. Kasun Silva" type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}/>
+                  <input required className="w-full h-10 px-3 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest shadow-sm" id="attendee-name" placeholder="e.g. Kasun Silva" type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}/>
                 </div>
               </div>
               <div className="flex-1 w-full">
                 <label className="block font-label-md text-label-md text-on-surface mb-1.5 font-medium" htmlFor="attendee-email">Email address</label>
                 <div className="relative flex items-center">
-                  <span className="material-symbols-outlined absolute left-3 text-outline text-[18px] pointer-events-none">mail</span>
-                  <input required className="w-full h-10 pl-9 pr-3 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest shadow-sm" id="attendee-email" placeholder="e.g. kasun@example.com" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}/>
+                  <input required className="w-full h-10 px-3 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest shadow-sm" id="attendee-email" placeholder="e.g. kasun@example.com" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}/>
                 </div>
               </div>
               <button disabled={busy} className="w-full md:w-auto h-10 px-space-lg bg-primary-container hover:bg-primary text-on-primary font-label-lg text-label-lg rounded-xl whitespace-nowrap transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50" type="submit">

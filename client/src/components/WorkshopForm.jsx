@@ -96,15 +96,13 @@ export default function WorkshopForm({ workshop, onSaved, onCancel }) {
                 <div>
                   <label className="block font-label-md text-label-md text-on-surface mb-1">Instructor <span className="text-error">*</span></label>
                   <div className="relative">
-                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">person</span>
-                    <input placeholder="Lead Instructor Name" value={f.instructor} onChange={set('instructor')} required className="w-full h-10 pl-9 pr-3 rounded-lg border border-outline-variant bg-surface focus:bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" />
+                    <input placeholder="Lead Instructor Name" value={f.instructor} onChange={set('instructor')} required className="w-full h-10 px-3 rounded-lg border border-outline-variant bg-surface focus:bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" />
                   </div>
                 </div>
                 <div>
                   <label className="block font-label-md text-label-md text-on-surface mb-1">Category</label>
                   <div className="relative">
-                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">category</span>
-                    <input placeholder="e.g. Pottery, Technology" value={f.category} onChange={set('category')} className="w-full h-10 pl-9 pr-3 rounded-lg border border-outline-variant bg-surface focus:bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" />
+                    <input placeholder="e.g. Pottery, Technology" value={f.category} onChange={set('category')} className="w-full h-10 px-3 rounded-lg border border-outline-variant bg-surface focus:bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" />
                   </div>
                 </div>
               </div>
@@ -121,15 +119,13 @@ export default function WorkshopForm({ workshop, onSaved, onCancel }) {
                 <div className="sm:col-span-1">
                   <label className="block font-label-md text-label-md text-on-surface mb-1">Duration (min) <span className="text-error">*</span></label>
                   <div className="relative">
-                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">timer</span>
-                    <input type="number" min="15" step="15" value={f.durationMinutes} onChange={set('durationMinutes')} required className="w-full h-10 pl-9 pr-3 rounded-lg border border-outline-variant bg-surface focus:bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" />
+                    <input type="number" min="15" step="15" value={f.durationMinutes} onChange={set('durationMinutes')} required className="w-full h-10 px-3 rounded-lg border border-outline-variant bg-surface focus:bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" />
                   </div>
                 </div>
                 <div className="sm:col-span-1">
                   <label className="block font-label-md text-label-md text-on-surface mb-1">Seat Capacity <span className="text-error">*</span></label>
                   <div className="relative">
-                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">groups</span>
-                    <input type="number" min="1" value={f.capacity} onChange={set('capacity')} required className="w-full h-10 pl-9 pr-3 rounded-lg border border-outline-variant bg-surface focus:bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" />
+                    <input type="number" min="1" value={f.capacity} onChange={set('capacity')} required className="w-full h-10 px-3 rounded-lg border border-outline-variant bg-surface focus:bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" />
                   </div>
                 </div>
               </div>
@@ -141,8 +137,7 @@ export default function WorkshopForm({ workshop, onSaved, onCancel }) {
               <div className="mb-4">
                 <label className="block font-label-md text-label-md text-on-surface mb-1">Location <span className="text-error">*</span></label>
                 <div className="relative">
-                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">location_on</span>
-                  <input placeholder="e.g. Lakeside (Studio A)" value={f.location} onChange={set('location')} required className="w-full h-10 pl-9 pr-3 rounded-lg border border-outline-variant bg-surface focus:bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" />
+                  <input placeholder="e.g. Lakeside (Studio A)" value={f.location} onChange={set('location')} required className="w-full h-10 px-3 rounded-lg border border-outline-variant bg-surface focus:bg-surface-container-lowest focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" />
                 </div>
               </div>
               <div>

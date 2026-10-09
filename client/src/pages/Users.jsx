@@ -113,11 +113,10 @@ export default function Users() {
               <div className="lg:col-span-3 flex flex-col gap-1.5">
                 <label className="font-label-md text-label-md text-on-surface font-medium">Full Name <span className="text-error">*</span></label>
                 <div className="relative">
-                  <span className="material-symbols-outlined absolute left-3 top-2.5 text-outline text-[18px]">badge</span>
                   <input 
                     type="text" placeholder="e.g., Kaveesha Perera" required
                     value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="w-full h-10 pl-9 pr-3 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md shadow-sm placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" 
+                    className="w-full h-10 px-3 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md shadow-sm placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" 
                   />
                 </div>
               </div>
@@ -125,11 +124,10 @@ export default function Users() {
               <div className="lg:col-span-3 flex flex-col gap-1.5">
                 <label className="font-label-md text-label-md text-on-surface font-medium">Email address <span className="text-error">*</span></label>
                 <div className="relative">
-                  <span className="material-symbols-outlined absolute left-3 top-2.5 text-outline text-[18px]">mail</span>
                   <input 
                     type="email" placeholder="kaveesha.p@trainingcentre.lk" required
                     value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    className="w-full h-10 pl-9 pr-3 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md shadow-sm placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" 
+                    className="w-full h-10 px-3 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md shadow-sm placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" 
                   />
                 </div>
               </div>
@@ -137,16 +135,15 @@ export default function Users() {
               <div className="lg:col-span-3 flex flex-col gap-1.5">
                 <div className="flex items-center justify-between">
                   <label className="font-label-md text-label-md text-on-surface font-medium">Temporary password <span className="text-error">*</span></label>
-                  <button type="button" onClick={generatePass} className="font-label-md text-label-md text-primary hover:underline">Generate</button>
+                  <button type="button" onClick={generatePass} className="font-label-md text-label-md !text-primary hover:underline !bg-transparent !border-none !p-0 !m-0 !shadow-none outline-none cursor-pointer flex items-center">Generate</button>
                 </div>
                 <div className="relative">
-                  <span className="material-symbols-outlined absolute left-3 top-2.5 text-outline text-[18px]">key</span>
                   <input 
                     type="text" placeholder="TempPass@2025" required minLength="8"
                     value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })}
-                    className="w-full h-10 pl-9 pr-9 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md shadow-sm placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-mono" 
+                    className="w-full h-10 pl-3 pr-9 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md shadow-sm placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-mono" 
                   />
-                  <button type="button" onClick={() => navigator.clipboard.writeText(form.password)} className="absolute right-2.5 top-2.5 text-outline hover:text-on-surface" title="Copy password">
+                  <button type="button" onClick={() => navigator.clipboard.writeText(form.password)} className="absolute right-2 top-2 !bg-transparent !border-none !p-1 !m-0 !shadow-none outline-none cursor-pointer flex items-center justify-center rounded hover:bg-surface-container-high transition-colors !text-outline hover:!text-on-surface" title="Copy password">
                     <span className="material-symbols-outlined text-[18px]">content_copy</span>
                   </button>
                 </div>
@@ -183,11 +180,10 @@ export default function Users() {
           <div className="p-space-lg flex flex-col sm:flex-row gap-space-md items-center justify-between">
             {/* Search Input */}
             <div className="relative w-full sm:w-80">
-              <span className="material-symbols-outlined absolute left-3 top-2.5 text-outline text-[18px]">search</span>
               <input 
                 type="text" placeholder="Search staff by name or email..."
                 value={search} onChange={(e) => setSearch(e.target.value)}
-                className="w-full h-10 pl-9 pr-8 rounded-xl bg-surface-container-low text-on-surface font-body-md text-body-md placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest shadow-sm transition-all" 
+                className="w-full h-10 pl-3 pr-8 rounded-xl bg-surface-container-low text-on-surface font-body-md text-body-md placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest shadow-sm transition-all" 
               />
               {search && (
                 <button onClick={() => setSearch('')} className="absolute right-2.5 top-2.5 text-outline hover:text-on-surface">
@@ -210,10 +206,7 @@ export default function Users() {
                 </select>
                 <span className="material-symbols-outlined absolute right-2.5 top-2.5 text-outline pointer-events-none text-[18px]">filter_list</span>
               </div>
-              <button type="button" className="h-10 px-space-md rounded-xl bg-surface-container-low text-on-surface hover:bg-surface-container-high transition-colors font-label-md text-label-md flex items-center gap-1.5 shadow-sm" title="Download credential audit log">
-                <span className="material-symbols-outlined text-[18px]">file_download</span>
-                <span className="hidden md:inline">Export</span>
-              </button>
+
             </div>
           </div>
 
